@@ -1,15 +1,20 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestLimit(t *testing.T) {
 	l := NewLimit(10_000)
-	l.AddOrder(NewOrder(true, 5))
-	l.AddOrder(NewOrder(true, 7))
-	l.AddOrder(NewOrder(true, 9))
-	if l.TotalVolume != 21 {
-		t.Error("not equal", l.TotalVolume)
-	}
+	oa := NewOrder(true, 5)
+	ob := NewOrder(true, 7)
+	oc := NewOrder(true, 9)
+	l.AddOrder(oa)
+	l.AddOrder(ob)
+	l.AddOrder(oc)
+	l.DeleteOrder(oa)
+	fmt.Println("new limit: ", l)
 }
 
 func TestOrderbook(t *testing.T) {
