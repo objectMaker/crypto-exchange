@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+type Match struct {
+	Ask        *Order
+	Bid        *Order
+	SizeFilled float64
+	Price      float64
+}
+
 type Order struct {
 	Size      float64
 	Limit     *Limit
@@ -23,8 +30,19 @@ type Limit struct {
 }
 
 type Orderbook struct {
-	Asks []*Limit
-	Bids []*Limit
+	Asks      []*Limit
+	Bids      []*Limit
+	AskLimits map[float64]*Limit
+	BidLimits map[float64]*Limit
+}
+
+func NewOrderBook() *Orderbook {
+	return &Orderbook{
+		Asks:      []*Limit{},
+		Bids:      []*Limit{},
+		AskLimits: make(map[float64]*Limit),
+		BidLimits: make(map[float64]*Limit),
+	}
 }
 
 func NewLimit(price float64) *Limit {
@@ -51,9 +69,9 @@ func (l *Limit) AddOrder(o *Order) {
 
 func (l *Limit) DeleteOrder(o *Order) {
 	orderLength := len(l.Orders)
-	for i := 0; i < len(l.Orders); i++ {
+	lastIndex := orderLength - 1
+	for i := 0; i < orderLength; i++ {
 		if l.Orders[i] == o {
-			lastIndex := orderLength - 1
 			// to remove current order
 			l.Orders[i] = l.Orders[lastIndex]
 			l.Orders = l.Orders[:lastIndex]
@@ -64,4 +82,33 @@ func (l *Limit) DeleteOrder(o *Order) {
 	o.Limit = nil
 	l.TotalVolume -= o.Size
 
+}
+
+func (ob *Orderbook) PlaceOrder(price float64, o *Order) []Match {
+
+	if o.Size > 0 {
+		ob.add(price, o)
+	}
+
+	return []Match{}
+}
+
+func (ob *Orderbook) add(price float64, o *Order) {
+	var limit *Limit
+	if o.Bid {
+		limit = ob.BidLimits[price]
+	} else {
+		limit = ob.AskLimits[price]
+	}
+	if limit == nil {
+		limit = NewLimit(price)
+		if o.Bid {
+			ob.Bids = append(ob.Bids, limit)
+			ob.BidLimits[price] = limit
+		} else {
+			ob.Asks = append(ob.Asks, limit)
+			ob.AskLimits[price] = limit
+		}
+	}
+	limit.AddOrder(o)
 }
