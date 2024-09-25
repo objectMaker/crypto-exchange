@@ -120,17 +120,7 @@ func (l *Limit) DeleteOrder(o *Order) {
 
 	sort.Sort(l.Orders)
 }
-
-func (ob *Orderbook) PlaceOrder(price float64, o *Order) []Match {
-
-	if o.Size > 0 {
-		ob.add(price, o)
-	}
-
-	return []Match{}
-}
-
-func (ob *Orderbook) add(price float64, o *Order) {
+func (ob *Orderbook) PlaceLimitOrder(price float64, o *Order) {
 	var limit *Limit
 	if o.Bid {
 		limit = ob.BidLimits[price]
