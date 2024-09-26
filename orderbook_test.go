@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func assert_eq(t *testing.T, a, b interface{}) {
+func assertEq(t *testing.T, a, b interface{}) {
 	if !reflect.DeepEqual(a, b) {
 		t.Fatalf("%+v not equals %+v", a, b)
 	}
@@ -36,6 +36,18 @@ func TestPlaceLimitOrder(t *testing.T) {
 	fmt.Printf("your ask: %v\n", ob.AskLimits[10_000])
 	fmt.Printf("your bid: %v", ob.BidLimits[10_000])
 	//bid buy
-	assert_eq(t, len(ob.Bids), 2)
-	assert_eq(t, len(ob.Asks), 1)
+	assertEq(t, len(ob.Bids()), 2)
+	assertEq(t, len(ob.Asks()), 1)
+}
+
+func TestPlaceMarketOrder(t *testing.T) {
+	ob := NewOrderBook()
+	buyOrder1 := NewOrder(false, 10)
+	buyOrder2 := NewOrder(false, 20)
+
+	ob.PlaceLimitOrder(100, buyOrder1)
+	ob.PlaceLimitOrder(100, buyOrder2)
+	marketOrder := NewOrder(true, 15)
+	matches := ob.PlaceMarketOrder(marketOrder)
+	fmt.Println(matches, "matches")
 }
