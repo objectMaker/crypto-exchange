@@ -14,7 +14,3 @@ This is a cryptocurrency exchange platform that allows users to buy, sell, and t
 - Market depth charts
 - Real-time price updates
 - Secure payment processing
-
-## Technologies
-
-- Frontend: React, Redux, Material-UI
