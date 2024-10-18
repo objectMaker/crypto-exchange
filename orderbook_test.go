@@ -42,12 +42,16 @@ func TestPlaceLimitOrder(t *testing.T) {
 
 func TestPlaceMarketOrder(t *testing.T) {
 	ob := NewOrderBook()
-	buyOrder1 := NewOrder(false, 10)
-	buyOrder2 := NewOrder(false, 20)
+	buyOrder1 := NewOrder(false, 20)
+	buyOrder2 := NewOrder(false, 10)
+	ob.PlaceLimitOrder(100_000, buyOrder1)
+	ob.PlaceLimitOrder(100_000, buyOrder2)
 
-	ob.PlaceLimitOrder(100, buyOrder1)
-	ob.PlaceLimitOrder(100, buyOrder2)
-	marketOrder := NewOrder(true, 15)
+	marketOrder := NewOrder(true, 24)
 	matches := ob.PlaceMarketOrder(marketOrder)
 	fmt.Println(matches, "matches")
+	fmt.Println(ob.Asks(), "total")
+	assertEq(t, ob.TotalAskVolume(), 6.0)
+	fmt.Println(matches, "matches")
+	fmt.Println(buyOrder1)
 }
