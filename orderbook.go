@@ -189,12 +189,12 @@ func (l *Limit) DeleteOrder(o *Order) {
 	o.Limit = nil
 }
 
-func (ob *Orderbook) PlaceMarketOrder(o *Order) (matches []Match) {
+func (ob *Orderbook) PlaceMarketOrder(o *Order) (matches []Match, err error) {
 	matches = []Match{}
 	if o.Bid {
 		fmt.Println("total ask", ob.TotalAskVolume())
 		if o.Size > ob.TotalAskVolume() {
-			panic(fmt.Sprintf("don't have enough asks,your bids is [%+v],total rest is [%+v]", o.Size, ob.TotalAskVolume()))
+			return nil, fmt.Errorf("don't have enough asks,your bids is [%+v],total rest is [%+v]", o.Size, ob.TotalAskVolume())
 		}
 		for _, limit := range ob.Asks() {
 			limitMatches := limit.Fill(o)
@@ -209,7 +209,7 @@ func (ob *Orderbook) PlaceMarketOrder(o *Order) (matches []Match) {
 		}
 	} else {
 		if o.Size > ob.TotalBidVolume() {
-			panic(fmt.Sprintf("don't have enough bids,your asks is [%+v],total rest is [%+v]", o.Size, ob.TotalBidVolume()))
+			return nil, fmt.Errorf("don't have enough asks,your bids is [%+v],total rest is [%+v]", o.Size, ob.TotalAskVolume())
 		}
 		for _, limit := range ob.Bids() {
 			if limit.Price == o.Limit.Price {
